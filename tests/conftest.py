@@ -1,12 +1,11 @@
 import pytest
 import datetime as dt
-from server import create_app
+import server
 
 
 @pytest.fixture
 def client():
-    app = create_app({"TESTING": True})
-    with app.test_client() as client:
+    with server.app.test_client() as client:
         yield client
 
 
@@ -59,15 +58,19 @@ def past_competition():
 
 
 @pytest.fixture
-def unlistedClub():
-    club = {"name": "test club", "email": "test@test.com", "points": "100"}
+def club():
+    club = {"name": "test club", "email": "test1@test.com", "points": "100"}
     return club
 
 
 @pytest.fixture
-def listedClub():
-    club = {"name": "Iron Temple", "email": "admin@irontemple.com", "points": "4"}
-    return club
+def unlisted_club():
+    unlisted_club = {
+        "name": "test club unlisted",
+        "email": "test_unlisted@test.com",
+        "points": "100",
+    }
+    return unlisted_club
 
 
 @pytest.fixture
