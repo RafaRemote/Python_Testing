@@ -1,5 +1,4 @@
 import pytest
-import datetime as dt
 import server
 
 
@@ -7,6 +6,22 @@ import server
 def client():
     with server.app.test_client() as client:
         yield client
+
+
+@pytest.fixture
+def club():
+    club = {"name": "test club 1", "email": "test1@test.com", "points": "100"}
+    return club
+
+
+@pytest.fixture
+def clubs():
+    clubs = [
+        {"name": "test club 1", "email": "test1@test.com", "points": "100"},
+        {"name": "test club 2", "email": "test2@test.com", "points": "20"},
+        {"name": "test club 3", "email": "test3@test.com", "points": "30"},
+    ]
+    return clubs
 
 
 @pytest.fixture
@@ -42,25 +57,6 @@ def competitions():
 
 
 @pytest.fixture
-def past_competition():
-    last_year = str(int(dt.datetime.now().strftime("%Y")) - 1)
-    competition = [
-        {
-            "name": "test future competition",
-            "date": dt.datetime.now().strftime(f"%{last_year}-%m-%d %H:%M:%S"),
-            "numberOfPlaces": "100",
-        }
-    ]
-    return competition
-
-
-@pytest.fixture
-def club():
-    club = {"name": "test club 1", "email": "test1@test.com", "points": "100"}
-    return club
-
-
-@pytest.fixture
 def unlisted_club():
     unlisted_club = {
         "name": "test club unlisted",
@@ -71,10 +67,6 @@ def unlisted_club():
 
 
 @pytest.fixture
-def clubs():
-    clubs = [
-        {"name": "test club 1", "email": "test1@test.com", "points": "100"},
-        {"name": "test club 2", "email": "test2@test.com", "points": "20"},
-        {"name": "test club 3", "email": "test3@test.com", "points": "30"},
-    ]
-    return clubs
+def config(mocker, clubs, competitions):
+    mocker.patch.object(server, "clubs", clubs)
+    mocker.patch.object(server, "competitions", competitions)

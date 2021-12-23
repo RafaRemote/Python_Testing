@@ -3,6 +3,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Summary | GUDLFT Registration</title>
+    <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon"> 
 </head>
 <body>
     <h2>Welcome, {{club['email']}} </h2><a href="{{url_for('logout')}}">Logout</a>
@@ -14,8 +15,8 @@
             <li>{{message}}</li>
         {% endfor %}
        </ul>
-    {% endif%}
-    Points Available: {{club['points']}}
+    {% endif %}
+    Points Available: <span id="club_points_left">{{club['points']}}</span>
     <h3>Competitions:</h3>
     <ul>
         {% for comp in competitions%}

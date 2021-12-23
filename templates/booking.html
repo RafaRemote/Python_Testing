@@ -3,6 +3,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Booking for {{competition['name']}} || GUDLFT</title>
+    <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon"> 
 </head>
 <body>
     <h2>{{competition['name']}}</h2>
@@ -16,7 +17,7 @@
        </ul>
     {% endif%}
     {% endwith %}
-    <form action="/purchase-places" method="post">
+    <form action="/purchase-places" method="POST">
         <input type="hidden" name="club_name" value="{{club['name']}}">
         <input type="hidden" name="competition_name" value="{{competition['name']}}">
         <label for="places">How many places?</label><input type="number" name="places" id="" min="1" max="{{club["points"]}}"/>
