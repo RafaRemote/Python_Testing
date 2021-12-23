@@ -1,5 +1,7 @@
 import json
 import requests
+import datetime as dt
+import time
 from flask import Flask, render_template, request, redirect, flash, url_for
 
 MAX_BOOK = 12
@@ -7,14 +9,18 @@ MAX_BOOK = 12
 
 def load_clubs():
     with open("clubs.json") as c:
-        listOfClubs = json.load(c)["clubs"]
-        return listOfClubs
+        list_of_clubs = json.load(c)["clubs"]
+        return list_of_clubs
 
 
 def load_competitions():
     with open("competitions.json") as comps:
-        listOfCompetitions = json.load(comps)["competitions"]
-        return listOfCompetitions
+        list_of_competitions = json.load(comps)["competitions"]
+        for i in list_of_competitions:
+            i["date_stamp"] = dt.datetime.timestamp(
+                dt.datetime.strptime(i["date"], "%Y-%m-%d %H:%M:%S")
+            )
+        return list_of_competitions
 
 
 app = Flask(__name__)
@@ -23,6 +29,7 @@ app.secret_key = "something_special"
 PLACE_COST = 1
 competitions = load_competitions()
 clubs = load_clubs()
+now = time.time()
 
 
 @app.route("/", strict_slashes=False)
@@ -30,7 +37,7 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/show-summary", methods=["POST"], strict_slashes=False)
+@app.route("/show-summary", methods=["GET", "POST"], strict_slashes=False)
 def show_summary():
     try:
         club = [club for club in clubs if club["email"] == request.form["email"]][0]
@@ -39,7 +46,12 @@ def show_summary():
     except requests.exceptions.RequestException:
         flash("Something went wrong-please try again")
         return redirect(url_for(index))
-    return render_template("welcome.html", club=club, competitions=competitions)
+    return render_template(
+        "welcome.html",
+        now=now,
+        club=club,
+        competitions=competitions,
+    )
 
 
 @app.route("/book/<competition>/<club>", strict_slashes=False)
@@ -60,7 +72,9 @@ def book(club, competition):
             ]
         if int(club["points"]) < 0:
             flash("Something went wrong-please try again")
-            return render_template("welcome.html", club=club, competitions=competitions)
+            return render_template(
+                "welcome.html", now=now, club=club, competitions=competitions
+            )
         elif int(club["points"]) > 0:
             if (
                 int(club["points"]) >= MAX_BOOK
@@ -91,10 +105,14 @@ def book(club, competition):
                 )
         else:
             flash("You cannot access booking page: you have no points left")
-            return render_template("welcome.html", club=club, competitions=competitions)
+            return render_template(
+                "welcome.html", now=now, club=club, competitions=competitions
+            )
     else:
         flash("Something went wrong-please try again")
-        return render_template("welcome.html", club=club, competitions=competitions)
+        return render_template(
+            "welcome.html", now=now, club=club, competitions=competitions
+        )
 
 
 @app.route("/purchase-places", methods=["POST"], strict_slashes=False)
@@ -112,6 +130,14 @@ def purchase_places():
         ][0]
         club = [c for c in clubs if c["name"] == request.form["club_name"]][0]
         places = request.form["places"]
+        if compet["date_stamp"] < now:
+            flash("You cannot purchase places for a past competition")
+            return render_template(
+                "booking.html",
+                club=club,
+                competition=compet,
+                maxi=MAX_BOOK,
+            )
     except Exception:
         flash("bad request")
         return render_template("index.html")
@@ -144,7 +170,9 @@ def purchase_places():
         flash("Great-booking complete!")
         club["points"] = int(club["points"]) - places_required
         compet["numberOfPlaces"] = int(compet["numberOfPlaces"]) - places_required
-        return render_template("welcome.html", club=club, competitions=competitions)
+        return render_template(
+            "welcome.html", now=now, club=club, competitions=competitions
+        )
 
 
 # TODO: Add route for points display

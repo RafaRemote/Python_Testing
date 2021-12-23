@@ -1,66 +1,8 @@
 import random
-import pytest
 
-
-class TestEndpoints:
-    @pytest.mark.parametrize("endpoint, status_code", [("/", 200), ("/logout", 200)])
-    def test_index_logout_unauthenticated_user_should_200(self, client, endpoint, status_code):
-        """Checks response when getting index and logout endpoints"""
-        response = client.get(endpoint, follow_redirects=True)
-        assert response.status_code == status_code
-
-    @pytest.mark.parametrize(
-        "endpoint, status_code", [("/show-summary", 405), ("/purchase-places", 405)]
-    )
-    def test_summary_and_purchase_unauthenticated_user_should_405(
-        self, client, endpoint, status_code
-    ):
-        """Checks response when unauthenticated user request"""
-        response = client.get(endpoint, follow_redirects=True)
-        assert response.status_code == status_code
-
-    def test_book_authenticated_user_should_200(self, client, club, competition, config):
-        club_name = club["name"].replace(" ", "%20")
-        competition_name = competition["name"].replace(" ", "%20")
-        response = client.get(f"/book/{club_name}/{competition_name}", follow_redirects=True)
-        assert response.status_code == 200
-
-    def test_book_unauthenticated_user_should_get_wrong(self, client, competition, config):
-        club_name = "random"
-        competition_name = competition["name"].replace(" ", "%20")
-        response = client.get(f"/book/{club_name}/{competition_name}", follow_redirects=True)
-        assert "wrong" in response.data.decode()
-
-class TestLogin:
-    def test_listed_email_should_200(self, client, club, config):
-        """Checks response when authenticated user request"""
-        data = {"email": club["email"]}
-        response = client.post("/show-summary", data=data, follow_redirects=True)
-        assert response.status_code == 200
-
-    @pytest.mark.parametrize(
-        "email, status_code",
-        [
-            ({"email": "unlisted@mail.com"}, 404),
-            ({"email": ""}, 404),
-            ({"email": "$%^"}, 404),
-        ],
-    )
-    def test_unlisted_mail_should_404(self, client, email, status_code, config):
-        """Checks response when unauthenticated user request"""
-        response = client.post("/show-summary", data=email, follow_redirects=True)
-        assert response.status_code == status_code
-
-    def test_login_bad_request_should_400(self, client, mocker, club, clubs, competitions):
-        """Checks response when bad request"""
-        data = {"address": club["email"]}
-        response = client.post("/show-summary", data=data, follow_redirects=True)
-        assert response.status_code == 400
 
 class TestPurchase:
-    def test_should_bad_request_keys_400(
-        self, client, club, competition, config
-    ):
+    def test_should_bad_request_keys_400(self, client, club, competition, config):
         """Checks response when bad request"""
         data = {
             "Klub_name": club["name"],
@@ -69,10 +11,10 @@ class TestPurchase:
         }
         response = client.post("/purchase-places", data=data, follow_redirects=True)
         data = response.data.decode()
-        assert 'bad request' in data
+        assert "bad request" in data
 
     def test_should_bad_request_values_400(
-        self, client, club, competition, config
+        self, client, club, competition, competitions, config
     ):
         """Checks response when bad request"""
         data = {
@@ -82,20 +24,16 @@ class TestPurchase:
         }
         response = client.post("/purchase-places", data=data, follow_redirects=True)
         data = response.data.decode()
-        assert 'bad request' in data
+        assert "bad request" in data
 
     def test_should_bad_request_empty_values_400(
         self, client, club, competition, config
     ):
         """Checks response when bad request"""
-        data = {
-            "club_name": "",
-            "competition_name": "",
-            "places": ""
-        }
+        data = {"club_name": "", "competition_name": "", "places": ""}
         response = client.post("/purchase-places", data=data, follow_redirects=True)
         data = response.data.decode()
-        assert 'bad request' in data
+        assert "bad request" in data
 
     def test_should_not_use_more_points_than_have(
         self, client, club, competition, config
@@ -126,7 +64,7 @@ class TestPurchase:
             "places": str(places_required),
         }
         response = client.post("/purchase-places", data=data, follow_redirects=True)
-        data = response.data.decode().split()
+        data = response.data.decode("utf-8").split()
         chunk = [i for i in data if "club_points_left" in i][0]
         points_left = int("".join([i for i in chunk if i.isdigit()]))
         assert points_left == club_points - places_required
@@ -153,4 +91,17 @@ class TestPurchase:
         }
         response = client.post("/purchase-places", data=data, follow_redirects=True)
         data = response.data.decode()
+        assert "cannot" in data
+
+    def test_should_not_book_past_competition(
+        self, client, club, past_competition, max_book, config
+    ):
+        """Check if user can book places for a past competition)"""
+        data = {
+            "club_name": club["name"],
+            "competition_name": past_competition["name"],
+            "places": 1,
+        }
+        response = client.post("/purchase-places", data=data, follow_redirects=True)
+        data = response.data.decode().split()
         assert "cannot" in data

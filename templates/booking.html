@@ -7,6 +7,7 @@
 </head>
 <body>
     <h2>{{competition['name']}}</h2>
+    <a href="{{url_for('logout')}}">Logout</a></br>
     Places available: {{competition['numberOfPlaces']}}
     {% with messages = get_flashed_messages()%}
     {% if messages %}

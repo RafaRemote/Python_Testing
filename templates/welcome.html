@@ -6,31 +6,43 @@
     <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon"> 
 </head>
 <body>
-    <h2>Welcome, {{club['email']}} </h2><a href="{{url_for('logout')}}">Logout</a>
-
+    <h2>Welcome, {{club['email']}} </h2>
+    <a href="{{url_for('logout')}}">Logout</a></br>
     {% with messages = get_flashed_messages()%}
-    {% if messages %}
+        {% if messages %}
+            <ul>
+            {% for message in messages %}
+                <li>{{message}}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        Club Points Available: <span id="club_points_left">{{club['points']}}</span>
         <ul>
-       {% for message in messages %}
-            <li>{{message}}</li>
-        {% endfor %}
-       </ul>
-    {% endif %}
-    Points Available: <span id="club_points_left">{{club['points']}}</span>
-    <h3>Competitions:</h3>
-    <ul>
-        {% for comp in competitions%}
-        <li>
-            {{comp['name']}}<br />
-            Date: {{comp['date']}}</br>
-            Number of Places: {{comp['numberOfPlaces']}}
-            {% if (club['points'] | int) > 0 %}
-                <a href="{{ url_for('book',competition=comp['name'],club=club['name']) }}">Book Places</a>
-            {%endif%}
-        </li>
-        <hr />
-        {% endfor %}
-    </ul>
+            {% for comp in competitions|reverse %}
+                {% if comp['date_stamp']|int > now|int %}
+                    <h3>Competition:</h3>
+                    <li>
+                        {{comp['name']}}<br />
+                        Date: {{comp['date']}}</br>
+                        Number of Places: {{comp['numberOfPlaces']}}
+                        {% if comp['numberOfPlaces'] %}
+                            <a href="{{ url_for('book',competition=comp['name'],club=club['name']) }}">Book Places</a>
+                        {% else %}
+                            <p>SOLDOUT</p>
+                        {% endif %}
+                    </li>
+                {% else %}
+                    <h3 style="color: lightgray;">Past Competition:</h3>
+                    <li style="color: gray;">
+                        {{comp['name']}}<br />
+                        Date: {{comp['date']}}</br>
+                        <p>Remaining Unbooked Places {{comp["numberOfPlaces"]}}</p>
+                    </li>
+
+                {% endif %}
+            <hr />
+            {% endfor %}
+        </ul>
     {%endwith%}
 
 </body>

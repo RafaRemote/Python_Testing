@@ -43,20 +43,31 @@ def club(clubs):
 
 @pytest.fixture
 def competitions(last_year, next_year):
+    date_next_year = dt.datetime.now().strftime(f"%{next_year}-%m-%d %H:%M:%S")
+    date_last_year = dt.datetime.now().strftime(f"%{last_year}-%m-%d %H:%M:%S")
     competitions = [
         {
             "name": "test competition 1",
-            "date": dt.datetime.now().strftime(f"%{next_year}-%m-%d %H:%M:%S"),
+            "date": date_next_year,
+            "date_stamp": dt.datetime.timestamp(
+                dt.datetime.strptime(date_next_year, "%Y-%m-%d %H:%M:%S")
+            ),
             "numberOfPlaces": "10",
         },
         {
             "name": "test competition 2",
-            "date": dt.datetime.now().strftime(f"%{last_year}-%m-%d %H:%M:%S"),
+            "date": date_last_year,
+            "date_stamp": dt.datetime.timestamp(
+                dt.datetime.strptime(date_last_year, "%Y-%m-%d %H:%M:%S")
+            ),
             "numberOfPlaces": "10",
         },
         {
             "name": "test competition 3",
-            "date": dt.datetime.now().strftime(f"%{last_year}-%m-%d %H:%M:%S"),
+            "date": date_last_year,
+            "date_stamp": dt.datetime.timestamp(
+                dt.datetime.strptime(date_last_year, "%Y-%m-%d %H:%M:%S")
+            ),
             "numberOfPlaces": "10",
         },
     ]
@@ -66,6 +77,11 @@ def competitions(last_year, next_year):
 @pytest.fixture
 def competition(competitions):
     return competitions[0]
+
+
+@pytest.fixture
+def past_competition(competitions):
+    return competitions[1]
 
 
 @pytest.fixture
