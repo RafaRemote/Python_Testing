@@ -4,21 +4,32 @@ import pytest
 
 class TestEndpoints:
     @pytest.mark.parametrize("endpoint, status_code", [("/", 200), ("/logout", 200)])
-    def test_access_unauthenticated_should_200(self, client, endpoint, status_code):
-        """Checks response when unauthenticated user request"""
+    def test_index_logout_unauthenticated_user_should_200(self, client, endpoint, status_code):
+        """Checks response when getting index and logout endpoints"""
         response = client.get(endpoint, follow_redirects=True)
         assert response.status_code == status_code
 
     @pytest.mark.parametrize(
         "endpoint, status_code", [("/show-summary", 405), ("/purchase-places", 405)]
     )
-    def test_access_unauthenticated_user_should_405(
+    def test_summary_and_purchase_unauthenticated_user_should_405(
         self, client, endpoint, status_code
     ):
         """Checks response when unauthenticated user request"""
         response = client.get(endpoint, follow_redirects=True)
         assert response.status_code == status_code
 
+    def test_book_authenticated_user_should_200(self, client, club, competition, config):
+        club_name = club["name"].replace(" ", "%20")
+        competition_name = competition["name"].replace(" ", "%20")
+        response = client.get(f"/book/{club_name}/{competition_name}", follow_redirects=True)
+        assert response.status_code == 200
+
+    def test_book_unauthenticated_user_should_get_wrong(self, client, competition, config):
+        club_name = "random"
+        competition_name = competition["name"].replace(" ", "%20")
+        response = client.get(f"/book/{club_name}/{competition_name}", follow_redirects=True)
+        assert "wrong" in response.data.decode()
 
 class TestLogin:
     def test_listed_email_should_200(self, client, club, config):
@@ -35,13 +46,57 @@ class TestLogin:
             ({"email": "$%^"}, 404),
         ],
     )
-    def test_unlisted_mails_should_404(self, client, email, status_code, config):
+    def test_unlisted_mail_should_404(self, client, email, status_code, config):
         """Checks response when unauthenticated user request"""
         response = client.post("/show-summary", data=email, follow_redirects=True)
         assert response.status_code == status_code
 
+    def test_login_bad_request_should_400(self, client, mocker, club, clubs, competitions):
+        """Checks response when bad request"""
+        data = {"address": club["email"]}
+        response = client.post("/show-summary", data=data, follow_redirects=True)
+        assert response.status_code == 400
 
 class TestPurchase:
+    def test_should_bad_request_keys_400(
+        self, client, club, competition, config
+    ):
+        """Checks response when bad request"""
+        data = {
+            "Klub_name": club["name"],
+            "competition_name": competition["name"],
+            "places": str(int(club["points"])),
+        }
+        response = client.post("/purchase-places", data=data, follow_redirects=True)
+        data = response.data.decode()
+        assert 'bad request' in data
+
+    def test_should_bad_request_values_400(
+        self, client, club, competition, config
+    ):
+        """Checks response when bad request"""
+        data = {
+            "club_name": "random",
+            "competition_name": "random",
+            "places": "random",
+        }
+        response = client.post("/purchase-places", data=data, follow_redirects=True)
+        data = response.data.decode()
+        assert 'bad request' in data
+
+    def test_should_bad_request_empty_values_400(
+        self, client, club, competition, config
+    ):
+        """Checks response when bad request"""
+        data = {
+            "club_name": "",
+            "competition_name": "",
+            "places": ""
+        }
+        response = client.post("/purchase-places", data=data, follow_redirects=True)
+        data = response.data.decode()
+        assert 'bad request' in data
+
     def test_should_not_use_more_points_than_have(
         self, client, club, competition, config
     ):

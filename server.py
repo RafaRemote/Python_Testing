@@ -1,4 +1,5 @@
 import json
+import requests
 from flask import Flask, render_template, request, redirect, flash, url_for
 
 MAX_BOOK = 12
@@ -35,6 +36,9 @@ def show_summary():
         club = [club for club in clubs if club["email"] == request.form["email"]][0]
     except (IndexError, TypeError):
         return page_not_found()
+    except requests.exceptions.RequestException:
+        flash("Something went wrong-please try again")
+        return redirect(url_for(index))
     return render_template("welcome.html", club=club, competitions=competitions)
 
 
@@ -42,10 +46,18 @@ def show_summary():
 def book(club, competition):
     if club and competition:
         try:
-            club["points"] > 0
-        except TypeError:
             club = [i for i in clubs if i["name"] == club][0]
             competition = [c for c in competitions if c["name"] == competition][0]
+        except IndexError:
+            flash("Something went wrong-please try again")
+            return render_template("index.html")
+        try:
+            club["points"] > 0
+        except TypeError:
+            club = [i for i in clubs if i["name"] == club["name"]][0]
+            competition = [c for c in competitions if c["name"] == competition["name"]][
+                0
+            ]
         if int(club["points"]) < 0:
             flash("Something went wrong-please try again")
             return render_template("welcome.html", club=club, competitions=competitions)
@@ -87,11 +99,22 @@ def book(club, competition):
 
 @app.route("/purchase-places", methods=["POST"], strict_slashes=False)
 def purchase_places():
-    compet = [c for c in competitions if c["name"] == request.form["competition_name"]][
-        0
-    ]
-    club = [c for c in clubs if c["name"] == request.form["club_name"]][0]
-    places = request.form["places"]
+    try:
+        request.form["club_name"] and request.form["competition_name"] and request.form[
+            "places"
+        ]
+    except Exception:
+        flash("bad request")
+        return render_template("index.html")
+    try:
+        compet = [
+            c for c in competitions if c["name"] == request.form["competition_name"]
+        ][0]
+        club = [c for c in clubs if c["name"] == request.form["club_name"]][0]
+        places = request.form["places"]
+    except Exception:
+        flash("bad request")
+        return render_template("index.html")
     if places.startswith("-") and club["points"][1:].isdigit():
         flash("you cannot book a negative number of places")
         return render_template(

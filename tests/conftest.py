@@ -1,5 +1,18 @@
 import pytest
 import server
+import datetime as dt
+
+
+@pytest.fixture
+def next_year():
+    next_year = str(int(dt.datetime.now().strftime("%Y")) + 1)
+    return next_year
+
+
+@pytest.fixture
+def last_year():
+    last_year = str(int(dt.datetime.now().strftime("%Y")) - 1)
+    return last_year
 
 
 @pytest.fixture
@@ -14,12 +27,6 @@ def max_book():
 
 
 @pytest.fixture
-def club():
-    club = {"name": "test club 1", "email": "test1@test.com", "points": "100"}
-    return club
-
-
-@pytest.fixture
 def clubs():
     clubs = [
         {"name": "test club 1", "email": "test1@test.com", "points": "100"},
@@ -30,31 +37,26 @@ def clubs():
 
 
 @pytest.fixture
-def competition():
-    competition = {
-        "name": "test competition 1",
-        "date": "2100-12-10 10:00:00",
-        "numberOfPlaces": "10",
-    }
-    return competition
+def club(clubs):
+    return clubs[0]
 
 
 @pytest.fixture
-def competitions():
+def competitions(last_year, next_year):
     competitions = [
         {
             "name": "test competition 1",
-            "date": "2100-12-10 10:00:00",
+            "date": dt.datetime.now().strftime(f"%{next_year}-%m-%d %H:%M:%S"),
             "numberOfPlaces": "10",
         },
         {
             "name": "test competition 2",
-            "date": "2020-12-10 10:00:00",
+            "date": dt.datetime.now().strftime(f"%{last_year}-%m-%d %H:%M:%S"),
             "numberOfPlaces": "10",
         },
         {
             "name": "test competition 3",
-            "date": "2000-12-10 10:00:00",
+            "date": dt.datetime.now().strftime(f"%{last_year}-%m-%d %H:%M:%S"),
             "numberOfPlaces": "10",
         },
     ]
@@ -62,13 +64,8 @@ def competitions():
 
 
 @pytest.fixture
-def unlisted_club():
-    unlisted_club = {
-        "name": "test club unlisted",
-        "email": "test_unlisted@test.com",
-        "points": "100",
-    }
-    return unlisted_club
+def competition(competitions):
+    return competitions[0]
 
 
 @pytest.fixture
