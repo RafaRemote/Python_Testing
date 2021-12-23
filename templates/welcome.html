@@ -16,6 +16,25 @@
             {% endfor %}
         </ul>
         {% endif %}
+        {% if club['info'] %}
+            <table style="border-collapse: collapse; border: 1px solid black; margin: 1px">
+                <thead>
+                    <tr>
+                        <th style="border: 1px solid black;">Item</th>
+                        <th style="border: 1px solid black;">Points</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in club['info'] %}
+                        <tr >
+                            <td style="border: 1px solid black; padding: 1em;">{{i[0]}}</td>
+                            <td style="border: 1px solid black; padding: 1em; auto;">{{i[1]}}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+
         Club Points Available: <span id="club_points_left">{{club['points']}}</span>
         <ul>
             {% for comp in competitions|reverse %}

@@ -5,6 +5,7 @@ import time
 from flask import Flask, render_template, request, redirect, flash, url_for
 
 MAX_BOOK = 12
+PLACE_COST = 1
 
 
 def load_clubs():
@@ -168,6 +169,13 @@ def purchase_places():
         return render_template("booking.html", club=club, competition=compet)
     else:
         flash("Great-booking complete!")
+        club["info"] = [
+            ["Places Booked", places_required],
+            ["Cost Per Place", PLACE_COST],
+            ["Points Redeemed", places_required * PLACE_COST],
+            ["Club Points Before", club["points"]],
+            ["Club Points After", int(club["points"]) - places_required],
+        ]
         club["points"] = int(club["points"]) - places_required
         compet["numberOfPlaces"] = int(compet["numberOfPlaces"]) - places_required
         return render_template(
