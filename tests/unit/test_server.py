@@ -21,7 +21,7 @@ class TestEndpoints:
 
 
 class TestLogin:
-    def test_login_listed_email_should_200(self, client, club, config):
+    def test_listed_email_should_200(self, client, club, config):
         """Checks response when authenticated user request"""
         data = {"email": club["email"]}
         response = client.post("/show-summary", data=data, follow_redirects=True)
@@ -35,16 +35,10 @@ class TestLogin:
             ({"email": "$%^"}, 404),
         ],
     )
-    def test_login_unlisted_mails_should_404(self, client, email, status_code, config):
+    def test_unlisted_mails_should_404(self, client, email, status_code, config):
         """Checks response when unauthenticated user request"""
         response = client.post("/show-summary", data=email, follow_redirects=True)
         assert response.status_code == status_code
-
-    def test_login_bad_request(self, client, mocker, club, clubs, competitions):
-        """Checks response when bad request"""
-        data = {"address": club["email"]}
-        response = client.post("/show-summary", data=data, follow_redirects=True)
-        assert response.status_code == 400
 
 
 class TestPurchase:
@@ -81,3 +75,27 @@ class TestPurchase:
         chunk = [i for i in data if "club_points_left" in i][0]
         points_left = int("".join([i for i in chunk if i.isdigit()]))
         assert points_left == club_points - places_required
+
+    def test_should_not_book_over_limit(
+        self, client, club, competition, max_book, config
+    ):
+        """Check if user can book over a limit (max_book)"""
+        data = {
+            "club_name": club["name"],
+            "competition_name": competition["name"],
+            "places": str(max_book + 1),
+        }
+        response = client.post("/purchase-places", data=data, follow_redirects=True)
+        data = response.data.decode()
+        assert "cannot" in data
+
+    def test_should_not_book_negative_places(self, client, club, competition, config):
+        """Check if user can book negative number of places"""
+        data = {
+            "club_name": club["name"],
+            "competition_name": competition["name"],
+            "places": "-1",
+        }
+        response = client.post("/purchase-places", data=data, follow_redirects=True)
+        data = response.data.decode()
+        assert "cannot" in data

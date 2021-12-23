@@ -9,6 +9,11 @@ def client():
 
 
 @pytest.fixture
+def max_book():
+    return 12
+
+
+@pytest.fixture
 def club():
     club = {"name": "test club 1", "email": "test1@test.com", "points": "100"}
     return club

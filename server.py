@@ -1,6 +1,8 @@
 import json
 from flask import Flask, render_template, request, redirect, flash, url_for
 
+MAX_BOOK = 12
+
 
 def load_clubs():
     with open("clubs.json") as c:
@@ -37,13 +39,47 @@ def show_summary():
 
 
 @app.route("/book/<competition>/<club>", strict_slashes=False)
-def book(competition, club):
-    found_club = [c for c in clubs if c["name"] == club][0]
-    found_competition = [c for c in competitions if c["name"] == competition][0]
-    if found_club and found_competition:
-        return render_template(
-            "booking.html", club=found_club, competition=found_competition
-        )
+def book(club, competition):
+    if club and competition:
+        try:
+            club["points"] > 0
+        except TypeError:
+            club = [i for i in clubs if i["name"] == club][0]
+            competition = [c for c in competitions if c["name"] == competition][0]
+        if int(club["points"]) < 0:
+            flash("Something went wrong-please try again")
+            return render_template("welcome.html", club=club, competitions=competitions)
+        elif int(club["points"]) > 0:
+            if (
+                int(club["points"]) >= MAX_BOOK
+                and int(competition["numberOfPlaces"]) >= MAX_BOOK
+            ):
+                flash(f"max places you can book is {MAX_BOOK}")
+                return render_template(
+                    "booking.html",
+                    club=club,
+                    competition=competition,
+                    maxi=MAX_BOOK,
+                )
+            elif int(club["points"]) >= int(competition["numberOfPlaces"]):
+                flash(f"max places you can book is {competition['numberOfPlaces']}")
+                return render_template(
+                    "booking.html",
+                    club=club,
+                    competition=competition,
+                    maxi=competition["numberOfPlaces"],
+                )
+            else:
+                flash(f'max places you can book is {club["points"]}')
+                return render_template(
+                    "booking.html",
+                    club=club,
+                    competition=competition,
+                    maxi=club["points"],
+                )
+        else:
+            flash("You cannot access booking page: you have no points left")
+            return render_template("welcome.html", club=club, competitions=competitions)
     else:
         flash("Something went wrong-please try again")
         return render_template("welcome.html", club=club, competitions=competitions)
@@ -55,7 +91,17 @@ def purchase_places():
         0
     ]
     club = [c for c in clubs if c["name"] == request.form["club_name"]][0]
-    places_required = int(request.form["places"])
+    places = request.form["places"]
+    if places.startswith("-") and club["points"][1:].isdigit():
+        flash("you cannot book a negative number of places")
+        return render_template(
+            "booking.html",
+            club=club,
+            competition=compet,
+            maxi=MAX_BOOK,
+        )
+    else:
+        places_required = int(request.form["places"])
     if places_required > int(club["points"]):
         flash(
             f"You cannot perform this action"
