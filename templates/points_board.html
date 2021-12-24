@@ -1,0 +1,41 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GUDLFT Points Board</title>
+    <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon"> 
+</head>
+<body>
+    <div style="margin: .5em;">
+        <form action="/logout">
+        <button type="submit">INDEX</button>
+        </form>
+    </div>
+    {% if clubs %}
+        <table style="border-collapse: collapse; border: 1px solid black; margin: 1px">
+            <thead>
+                <tr> 
+                    <th colspan="2" style="border: 1px solid black; text-align: center; padding: 1em;">LIST OF CLUBS</th>
+                </tr>
+                <tr>
+                    <th style="border: 1px solid black; padding: 1em;">CLUB</th>
+                    <th style="border: 1px solid black; padding: 1em;">POINTS</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in clubs %}
+                    <tr >
+                        <td style="border: 1px solid black; padding: 1em;">{{i['name']}}</td>
+                        <td style="border: 1px solid black; padding: 1em; auto; text-align: center;">{{i['points']}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+    <script>
+        function go_back() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>

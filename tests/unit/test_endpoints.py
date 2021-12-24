@@ -2,7 +2,9 @@ import pytest
 
 
 class TestEndpoints:
-    @pytest.mark.parametrize("endpoint, status_code", [("/", 200), ("/logout", 200)])
+    @pytest.mark.parametrize(
+        "endpoint, status_code", [("/", 200), ("/logout", 200), ("/points-board", 200)]
+    )
     def test_index_logout_unauthenticated_user_should_200(
         self, client, endpoint, status_code
     ):

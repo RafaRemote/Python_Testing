@@ -7,35 +7,57 @@
 </head>
 <body>
     <h2>Welcome, {{club['email']}} </h2>
-    <a href="{{url_for('logout')}}">Logout</a></br>
+    <div style="margin: .5em;">
+        <form action="/logout">
+            <button type="submit">LOGOUT</button>
+        </form>
+    </div>
     {% with messages = get_flashed_messages()%}
         {% if messages %}
             <ul>
             {% for message in messages %}
-                <li>{{message}}</li>
+                <li>{{message|upper}}</li>
             {% endfor %}
         </ul>
         {% endif %}
         {% if club['info'] %}
-            <table style="border-collapse: collapse; border: 1px solid black; margin: 1px">
+            <table style="border-collapse: collapse; border: 1px solid black; margin: 1em">
                 <thead>
                     <tr>
-                        <th style="border: 1px solid black;">Item</th>
-                        <th style="border: 1px solid black;">Points</th>
+                        <th  colspan="2" style="border: 1px solid black; padding: 1em;">YOUR LAST BOOKING</th>
+                    </tr>
+                    <tr>
+                        <th style="border: 1px solid black; padding: 1em;">ITEM</th>
+                        <th style="border: 1px solid black; padding: 1em;">POINTS</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for i in club['info'] %}
                         <tr >
-                            <td style="border: 1px solid black; padding: 1em;">{{i[0]}}</td>
-                            <td style="border: 1px solid black; padding: 1em; auto;">{{i[1]}}</td>
+                            <td style="border: 1px solid black; padding: 1em; text-align: center;">{{i[0]}}</td>
+                            <td style="border: 1px solid black; padding: 1em; text-align: center;">{{i[1]}}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
         {% endif %}
-
-        Club Points Available: <span id="club_points_left">{{club['points']}}</span>
+        <table style="border-collapse: collapse; border: 1px solid black; margin: 1em">
+            <thead>
+                <tr>
+                    <th  colspan="2" style="border: 1px solid black; padding: 1em;">YOUR CLUB REMAINING POINTS</th>
+                </tr>
+                <tr>
+                    <th style="border: 1px solid black; padding: 1em;">CLUB</th>
+                    <th style="border: 1px solid black; padding: 1em;">POINTS</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr >
+                    <td style="border: 1px solid black; padding: 1em; text-align: center;">{{club['name']}}</td>
+                    <td style="border: 1px solid black; padding: 1em; text-align: center;"><span id="club_points_left">{{club['points']}}</span></td>
+                </tr>
+            </tbody>
+        </table>
         <ul>
             {% for comp in competitions|reverse %}
                 {% if comp['date_stamp']|int > now|int %}
@@ -45,7 +67,9 @@
                         Date: {{comp['date']}}</br>
                         Number of Places: {{comp['numberOfPlaces']}}
                         {% if comp['numberOfPlaces'] %}
-                            <a href="{{ url_for('book',competition=comp['name'],club=club['name']) }}">Book Places</a>
+                            <form action="{{"/book/"+comp["name"]+"/"+club["name"] }}">
+                                <input type="submit" value="BOOK" />
+                            </form>
                         {% else %}
                             <p>SOLDOUT</p>
                         {% endif %}
@@ -57,12 +81,10 @@
                         Date: {{comp['date']}}</br>
                         <p>Remaining Unbooked Places {{comp["numberOfPlaces"]}}</p>
                     </li>
-
                 {% endif %}
             <hr />
             {% endfor %}
         </ul>
     {%endwith%}
-
 </body>
 </html>

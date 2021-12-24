@@ -35,7 +35,7 @@ now = time.time()
 
 @app.route("/", strict_slashes=False)
 def index():
-    return render_template("index.html")
+    return render_template("index.html", clubs=clubs)
 
 
 @app.route("/show-summary", methods=["GET", "POST"], strict_slashes=False)
@@ -105,7 +105,7 @@ def book(club, competition):
                     maxi=club["points"],
                 )
         else:
-            flash("You cannot access booking page: you have no points left")
+            flash("You cannot access booking page, you have no points left")
             return render_template(
                 "welcome.html", now=now, club=club, competitions=competitions
             )
@@ -184,6 +184,11 @@ def purchase_places():
 
 
 # TODO: Add route for points display
+
+
+@app.route("/points-board", strict_slashes=False)
+def points_board():
+    return render_template("points_board.html", clubs=clubs)
 
 
 @app.route("/logout", strict_slashes=False)
