@@ -5,7 +5,7 @@ import time
 from flask import Flask, render_template, request, redirect, flash, url_for
 
 MAX_BOOK = 12
-PLACE_COST = 1
+PLACE_COST = 3
 
 
 def load_clubs():
@@ -27,7 +27,6 @@ def load_competitions():
 app = Flask(__name__)
 app.secret_key = "something_special"
 
-PLACE_COST = 1
 competitions = load_competitions()
 clubs = load_clubs()
 now = time.time()
@@ -52,6 +51,7 @@ def show_summary():
         now=now,
         club=club,
         competitions=competitions,
+        place_cost=PLACE_COST,
     )
 
 
@@ -74,12 +74,16 @@ def book(club, competition):
         if int(club["points"]) < 0:
             flash("Something went wrong-please try again")
             return render_template(
-                "welcome.html", now=now, club=club, competitions=competitions
+                "welcome.html",
+                now=now,
+                club=club,
+                competitions=competitions,
+                place_cost=PLACE_COST,
             )
         elif int(club["points"]) > 0:
             if (
-                int(club["points"]) >= MAX_BOOK
-                and int(competition["numberOfPlaces"]) >= MAX_BOOK
+                int(club["points"]) / PLACE_COST >= MAX_BOOK
+                and competition["numberOfPlaces"] >= MAX_BOOK
             ):
                 flash(f"max places you can book is {MAX_BOOK}")
                 return render_template(
@@ -88,31 +92,43 @@ def book(club, competition):
                     competition=competition,
                     maxi=MAX_BOOK,
                 )
-            elif int(club["points"]) >= int(competition["numberOfPlaces"]):
+            elif (int(club["points"]) / PLACE_COST) >= int(
+                competition["numberOfPlaces"]
+            ):
                 flash(f"max places you can book is {competition['numberOfPlaces']}")
                 return render_template(
                     "booking.html",
                     club=club,
                     competition=competition,
-                    maxi=competition["numberOfPlaces"],
+                    maxi=int(competition["numberOfPlaces"] / PLACE_COST),
                 )
             else:
-                flash(f'max places you can book is {club["points"]}')
+                flash(
+                    f'max places you can book is {int(int(club["points"]) / PLACE_COST)}'
+                )
                 return render_template(
                     "booking.html",
                     club=club,
                     competition=competition,
-                    maxi=club["points"],
+                    maxi=int(int(club["points"]) / PLACE_COST),
                 )
         else:
             flash("You cannot access booking page, you have no points left")
             return render_template(
-                "welcome.html", now=now, club=club, competitions=competitions
+                "welcome.html",
+                now=now,
+                club=club,
+                competitions=competitions,
+                place_cost=PLACE_COST,
             )
     else:
         flash("Something went wrong-please try again")
         return render_template(
-            "welcome.html", now=now, club=club, competitions=competitions
+            "welcome.html",
+            now=now,
+            club=club,
+            competitions=competitions,
+            place_cost=PLACE_COST,
         )
 
 
@@ -152,14 +168,15 @@ def purchase_places():
         )
     else:
         places_required = int(request.form["places"])
-    if places_required > int(club["points"]):
-        flash(
-            f"You cannot perform this action"
-            f"You asked {places_required} place(s), and you have {club['points']} point(s)"
-            f"A place costs {PLACE_COST} point(s)"
-            f"Therefore you need {places_required * PLACE_COST} point(s) to book {places_required}"
+    if (places_required * PLACE_COST) > int(club["points"]):
+        flash("You cannot perform this action")
+        return render_template(
+            "welcome.html",
+            now=now,
+            club=club,
+            competitions=competitions,
+            place_cost=PLACE_COST,
         )
-        return render_template("booking.html", club=club, competition=compet)
     elif places_required > int(compet["numberOfPlaces"]):
         flash(
             f"You cannot perform this action"
@@ -174,12 +191,16 @@ def purchase_places():
             ["Cost Per Place", PLACE_COST],
             ["Points Redeemed", places_required * PLACE_COST],
             ["Club Points Before", club["points"]],
-            ["Club Points After", int(club["points"]) - places_required],
+            ["Club Points After", int(club["points"]) - (places_required * PLACE_COST)],
         ]
-        club["points"] = int(club["points"]) - places_required
+        club["points"] = int(club["points"]) - (places_required * PLACE_COST)
         compet["numberOfPlaces"] = int(compet["numberOfPlaces"]) - places_required
         return render_template(
-            "welcome.html", now=now, club=club, competitions=competitions
+            "welcome.html",
+            now=now,
+            club=club,
+            competitions=competitions,
+            place_cost=PLACE_COST,
         )
 
 

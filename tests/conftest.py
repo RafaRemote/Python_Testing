@@ -27,6 +27,11 @@ def max_book():
 
 
 @pytest.fixture
+def place_cost():
+    return 3
+
+
+@pytest.fixture
 def clubs():
     clubs = [
         {"name": "test club 1", "email": "test1@test.com", "points": "100"},

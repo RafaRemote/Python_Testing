@@ -6,3 +6,4 @@ lib
 __pycache__
 env/
 x.py
+.coverage
