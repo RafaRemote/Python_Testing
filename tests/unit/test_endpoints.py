@@ -16,7 +16,7 @@ class TestEndpoints:
         "endpoint, status_code", [("/show-summary", 400), ("/purchase-places", 405)]
     )
     def test_summary_and_purchase_unauthenticated_user_should_fail(
-        self, client, endpoint, status_code
+        self, client, endpoint, status_code, config
     ):
         """Checks response when unauthenticated user request"""
         response = client.get(endpoint, follow_redirects=True)

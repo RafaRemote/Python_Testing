@@ -40,8 +40,8 @@
     <form style="margin: .5em;" action="/purchase-places" method="POST">
         <input type="hidden" name="club_name" value="{{club['name']}}">
         <input type="hidden" name="competition_name" value="{{competition['name']}}">
-        <label for="places">How many places? </label><input type="number" name="places" id="" min="1" max="{{maxi}}"/>
-        <button type="submit">Book</button>
+        <label for="places">How many places? </label><input id="book_places" type="number" name="places" id="" min="1" max="{{maxi}}"/>
+        <button id="button_book_places" type="submit">Book</button>
     </form>
     <script>
         function go_back() {

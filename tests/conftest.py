@@ -88,3 +88,14 @@ def past_competition(competitions):
 def config(mocker, clubs, competitions):
     mocker.patch.object(server, "clubs", clubs)
     mocker.patch.object(server, "competitions", competitions)
+
+
+@pytest.fixture
+def webdriver():
+    from selenium import webdriver
+    from webdriver_manager.chrome import ChromeDriverManager
+    from selenium.webdriver.chrome.service import Service
+
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service)
+    yield driver

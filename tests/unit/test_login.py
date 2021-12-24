@@ -21,9 +21,7 @@ class TestLogin:
         response = client.post("/show-summary", data=email, follow_redirects=True)
         assert response.status_code == status_code
 
-    def test_login_bad_request_should_400(
-        self, client, mocker, club, clubs, competitions
-    ):
+    def test_login_bad_request_should_400(self, client, club):
         """Checks response when bad request"""
         data = {"address": club["email"]}
         response = client.post("/show-summary", data=data, follow_redirects=True)

@@ -9,7 +9,7 @@
     <h1>Welcome to the GUDLFT Registration Portal!</h1>
     <div style="margin: .5em;">
         <form action="/points-board">
-            <button type="submit">POINTS BOARD</button>
+            <button id="points_board" type="submit">POINTS BOARD</button>
         </form>
     </div>
     {% with messages = get_flashed_messages()%}
@@ -25,7 +25,7 @@
     <form action="show-summary" method="post">
         <label for="email">Email:</label>
         <input type="email" name="email" id="" required/>
-        <button type="submit">Enter</button>
+        <button id="email" type="submit">Enter</button>
     </form>
 </body>
 </html>
