@@ -23,6 +23,7 @@ pyparsing==3.0.6
 pytest==6.2.5
 pytest-flask==1.2.0
 pytest-mock==3.6.1
+requests==2.26.0
 toml==0.10.2
 tomli==1.2.3
 typing_extensions==4.0.1
