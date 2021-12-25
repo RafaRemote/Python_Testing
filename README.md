@@ -22,14 +22,16 @@
 
 3. Installation
 
-    | Installation Short Summary (details below the table) |
-    |------------------------------------------------------|
-    | python -m venv env                                   |
-    | source env/bin/activate                              |
-    | pip install --upgrade pip                            |
-    | pip install -r requirements.txt                      |
-    | export FLASK_APP=server                              |
-    | flask run                                            |  
+    | Installation Short Summary - details below the table           |
+    |----------------------------------------------------------------|
+    | python -m venv env                                             |
+    | source env/bin/activate                                        |
+    | pip install --upgrade pip                                      |
+    | pip install -r requirements.txt                                |
+    | export FLASK_ENV=development                                   |
+    | export FLASK_APP=server                                        |
+    | flask run                                                      |
+    | Please Note: check your Python interpreter, it should be 3.9.2 |
 
     * After cloning, change into the directory and type `python -v venv env`. This will then set up a a virtual python environment within that directory.
 
