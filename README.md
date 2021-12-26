@@ -29,7 +29,7 @@
     | pip install --upgrade pip                                      |
     | pip install -r requirements.txt                                |
     | export FLASK_ENV=development                                   |
-    | python server                                                  |
+    | python server.py                                               |
     | Please Note: check your Python interpreter, it should be 3.9.2 |
 
     * After cloning, change into the directory and type `python -v venv env`. This will then set up a a virtual python environment within that directory.
@@ -38,7 +38,7 @@
 
     * Rather than hunting around for the packages you need, you can install in one step. Upgrade pip: `pip install --upgrade pip`, then type `pip install -r requirements.txt`. This will install all the packages listed in the respective file. If you install a package, make sure others know by updating the requirements.txt file. An easy way to do this is `pip freeze > requirements.txt`
 
-    * A conditional structure has been implemented in the main file: server.py, in order to be able to open the app typing `python server` in the terminal.
+    * A conditional structure has been implemented in the main file: server.py, in order to be able to open the app typing `python server.py` in the terminal.
 
 4. Current Setup
 
