@@ -5,5 +5,5 @@ lib
 .envrc
 __pycache__
 env/
-.coverage
 x.py
+.coverage

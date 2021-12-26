@@ -44,17 +44,23 @@
         <table style="border-collapse: collapse; border: 1px solid black; margin: 1em">
             <thead>
                 <tr>
-                    <th  colspan="2" style="border: 1px solid black; padding: 1em;">YOUR CLUB REMAINING POINTS</th>
+                    <th  colspan="4" style="border: 1px solid black; padding: 1em;">YOUR CLUB REMAINING POINTS</th>
                 </tr>
                 <tr>
                     <th style="border: 1px solid black; padding: 1em;">CLUB</th>
                     <th style="border: 1px solid black; padding: 1em;">POINTS</th>
+                    <th style="border: 1px solid black; padding: 1em;">PLACE COST</th>
+                    <th style="border: 1px solid black; padding: 1em;">PLACES YOU CAN PURCHASE</th>
+
+                    
                 </tr>
             </thead>
             <tbody>
                 <tr >
                     <td style="border: 1px solid black; padding: 1em; text-align: center;">{{club['name']}}</td>
                     <td style="border: 1px solid black; padding: 1em; text-align: center;"><span id="club_points_left">{{club['points']}}</span></td>
+                    <td style="border: 1px solid black; padding: 1em; text-align: center;"><span id="club_points_left">{{place_cost}}</span></td>
+                    <td style="border: 1px solid black; padding: 1em; text-align: center;"><span id="club_points_left">{{(club["points"]|int / place_cost|int)|int}}</span></td>
                 </tr>
             </tbody>
         </table>
@@ -66,12 +72,12 @@
                         <p>{{comp['name']}}</p><br />
                         Date: {{comp['date']}}</br>
                         Number of Places: {{comp['numberOfPlaces']}}
-                        {% if comp['numberOfPlaces'] %}
-                            <form id="{{comp['name']}}" action="{{"/book/"+comp["name"]+"/"+club["name"] }}">
+                        {% if (club["points"]|int / place_cost|int)|int and  (club["points"]|int / place_cost|int)|int <= comp['numberOfPlaces']|int %}
+                            <form action="{{"/book/"+comp["name"]+"/"+club["name"] }}">
                                 <input type="submit" value="BOOK" />
                             </form>
-                        {% else %}
-                            <p>SOLDOUT</p>
+                        {% elif (club["points"]|int / place_cost|int)|int < 1  %}
+                            <p>You haven't got enough points to book a place</p>
                         {% endif %}
                     </li>
                 {% else %}
