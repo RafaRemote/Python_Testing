@@ -1,55 +1,46 @@
-# gudlift-registration
+# gudlift-registration - Quality Assurance Branch
 
 1. Why
 
-    This is a proof of concept (POC) project to show a light-weight version of our competition booking platform. The aim is the keep things as light as possible, and use feedback from the users to iterate.
+    This branch is meant for testing purposes only.
 
-2. Getting Started
+    Tools:
+    * [Locust](https://pypi.org/project/locust/) as performance testing tool.
+    * [Selenium](https://pypi.org/project/selenium/) as automatic testing tool for functional test.
+    * [Coverage](https://pypi.org/project/coverage/) as code coverage measurement tool.
 
-    This project uses the following technologies:
+2. Installation
 
-    * Python v3.x+
+    | Installation Short Summary            | Folder |
+    |---------------------------------------|--------|
+    | ```pip install -r requirements.txt``` | root   |
 
-    * [Flask](https://flask.palletsprojects.com/en/1.1.x/)
+3. Testing
 
-        Whereas Django does a lot of things for us out of the box, Flask allows us to add only what we need.
+    Code coverage measurement.
 
-    * [Virtual environment](https://virtualenv.pypa.io/en/stable/installation.html)
+    | Coverage               | Folder |
+    |------------------------|--------|
+    | ```pytest --cov=.```   | root   |
 
-        This ensures you'll be able to install the correct packages without interfering with Python on your machine.
+    Selenium Functional test will be be also run with this above command, so the coverage will also include the result of this test.
 
-        Before you begin, please ensure you have this installed globally.
+    Performance measurement.
 
-3. Installation
+    | Locust without webinterface                                                    | Folder                  |
+    |--------------------------------------------------------------------------------|-------------------------|
+    | ```locust -f locustfile.py -H http://127.0.0.1:5000/ -u 6 -r 1 --headless```   | tests/performance_tests |
 
-    | Installation Short Summary - details below the table           |
-    |----------------------------------------------------------------|
-    | python -m venv env                                             |
-    | source env/bin/activate                                        |
-    | pip install --upgrade pip                                      |
-    | pip install -r requirements.txt                                |
-    | export FLASK_ENV=development                                   |
-    | python server.py                                               |
-    | Please Note: check your Python interpreter, it should be 3.9.2 |
+    | Locust with    webinterface                                                    | Folder                  |
+    |--------------------------------------------------------------------------------|-------------------------|
+    | ```locust -f locustfile.py -H http://127.0.0.1:5000/ -u 6 -r 1 --autostart```  | tests/performance_tests |
 
-    * After cloning, change into the directory and type `python -v venv env`. This will then set up a a virtual python environment within that directory.
+    [Translation](https://docs.locust.io/en/stable/configuration.html):
+    * -f: filename
+    * -H: host
+    * -u: users
+    * -r: rate (spawn rate)
+    * --autostart: runs immediately with web UI
+    * --headless: runs immediately without the web UI
 
-    * Next, type `source env/bin/activate`. You should see that your command prompt has changed to the name of the folder. This means that you can install packages in here without affecting affecting files outside. To deactivate, type `deactivate`
-
-    * Rather than hunting around for the packages you need, you can install in one step. Upgrade pip: `pip install --upgrade pip`, then type `pip install -r requirements.txt`. This will install all the packages listed in the respective file. If you install a package, make sure others know by updating the requirements.txt file. An easy way to do this is `pip freeze > requirements.txt`
-
-    * A conditional structure has been implemented in the main file: server.py, in order to be able to open the app typing `python server.py` in the terminal.
-
-4. Current Setup
-
-    The app is powered by [JSON files](https://www.tutorialspoint.com/json/json_quick_guide.htm). This is to get around having a DB until we actually need one. The main ones are:
-
-    * competitions.json - list of competitions
-    * clubs.json - list of clubs with relevant information. You can look here to see what email addresses the app will accept for login.
-
-5. Testing
-
-    You are free to use whatever testing framework you like-the main thing is that you can show what tests you are using.  
-
-    We also like to show how well we're testing, so there's a module called.
-    [coverage](https://coverage.readthedocs.io/en/coverage-5.1/) you should add to your project.
+    Be Careful to be in the good folder to run locust, you need to run Locust from where ```locustfile.py``` is located.
